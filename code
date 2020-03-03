@@ -1,0 +1,65 @@
+<!--#passthrough
+<?php
+
+// Insert blogs.iu.edu RSS Feed into IU Web Framework WCMS site
+// Paste code into code chunk
+// zachstei@iu.edu, 03032020
+
+// Settings
+$limit = 2;
+$columnTitle = "The Latest from our Blog";
+$rssFeedURL = "https://blogs.iu.edu/iusonews/feed/";
+
+
+// Necessary options to pull from blogs.iu.edu
+$opts = array(
+	'http'	=>	array(
+		'user_agent'	=>	'PHP libxml agent'
+	)
+);
+
+$context = stream_context_create($opts);
+libxml_set_streams_context($context);
+
+// Get RSS Feed from blogs.iu.edu
+$rss = new DOMDocument();
+$rss->load($rssFeedURL);
+$feed = array();
+
+
+// Add Framework divs and feed title
+echo '<div class="layout">';
+echo '<h3>'.$columnTitle.'</h3>';
+echo '<ul class="feed">';
+
+
+// Process Feed Array
+foreach ($rss->getElementsByTagName('item') as $node) {
+	$item = array(
+		'title' => $node->getElementsByTagName('title')->item(0)->nodeValue,
+		'link' => $node->getElementsByTagName('link')->item(0)->nodeValue,
+	);
+	array_push($feed, $item);
+}
+
+// Process and echo each post title and URL
+for($x=0;$x<$limit;$x++) {
+	$title = str_replace(' & ', ' &amp; ', $feed[$x]['title']);
+	$link = $feed[$x]['link'];
+    
+    echo '<li class="news feed-item" style="border:none;" itemscope="itemscope" itemtype="http://schema.org/NewsArticle">';
+	echo '<p class="title">
+	  <a itemprop="url" href="'.$link.'" title="'.$title.'" class="external">
+	  <span style="font-size:18px;">'.$title.'</span>
+	  </a>
+	  </p>';
+    echo '</li>';
+}
+
+echo '</ul>';
+echo '</div>';
+?>
+
+<a href="https://blogs.iu.edu/iusonews" class="more button external">Explore more topics</a>
+
+#passthrough-->
